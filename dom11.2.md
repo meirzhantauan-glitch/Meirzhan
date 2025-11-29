@@ -1,61 +1,52 @@
 ```mermaid 
-@startuml ComponentDiagram
-title UML Компонент Диаграммасы: Логистикалық Жүйе
 
-' Компоненттерді анықтау
-component [Frontend (Web/Mobile)] as FE
-component [Backend / Biznes Logika] as BE
-component [Məlіmetter bazasy] as DB
-component [Marshrutty Optim. Modul] as RO
-component [Kurierler Integr. Modul] as CI
-component [Habarlama Zhuyesi] as NS
-component [Skladty Basqaru Moduli] as IM
+graph TD
+    %% ВНЕШНИЕ СИСТЕМЫ
+    ExtCouriers["Внешние Курьерские Службы<br>(External Logistics Providers)"]
+    PaymentSys["Платежный Шлюз<br>(Payment Gateway)"]
 
-' Интерфейстерді анықтау (Ортақ нотация)
-interface "REST API" as REST
-interface "Database (SQL)" as SQL
-interface "Inventory API" as INV
-interface "Route Optimization API" as ROUTE_OPT
-interface "Courier API" as COURIER
-interface "Notification Service" as NOTIF
+    %% FRONTEND
+    subgraph Frontend_Layer [Frontend Layer]
+        WebApp["Web Application<br>(Клиенты)"]
+        MobApp["Mobile Application<br>(Курьеры)"]
+    end
 
-' Сыртқы жүйелер
-component [Syrtyqy Kuriier API] as ExtCourier
-component [Tolem Zhuyesi (Vneshniy)] as Payment
-component [SMS/Email API] as ExtNotif
+    %%  BACKEND 
+    subgraph Backend_System [Backend System]
+        Backend["Backend Core<br>(Order Management)"]
+        
+        Warehouse["Модуль Склада<br>(Warehouse Mgmt)"]
+        RouteOpt["Модуль Оптимизации<br>Маршрутов"]
+        Notify["Система Уведомлений<br>(Notification Service)"]
+        CourierAdapter["Модуль Интеграции<br>с Курьерами"]
+        Analytics["Система Аналитики"]
+        
+        DB[("База Данных<br>(DB)")]
+    end
 
-' Қатынастар (Жеткізілетін және Талап етілетін интерфейстер)
+    %%  СВЯЗИ 
 
-' Frontend - Backend
-FE -[ REST
+    %% Frontend -> Backend
+    WebApp -- "REST API / HTTPS" --> Backend
+    MobApp -- "REST API / HTTPS" --> Backend
 
-' Backend - Интерфейстер
-BE .right.o NOTIF : uses
-NS .left. NOTIF
+    %% Backend -> Database
+    Backend -- "JDBC / SQL (Чтение/Запись)" --> DB
+    Warehouse -. "Обновление остатков" .-> DB
 
-BE .up.o ROUTE_OPT : uses
-RO .down. ROUTE_OPT
+    %% Backend -> Modules
+    Backend -- "Inventory API (Резерв)" --> Warehouse
+    Backend -- "Route Calc Interface" --> RouteOpt
+    Backend -- "Msg Queue (Триггер)" --> Notify
+    Backend -- "Log Stream" --> Analytics
+    Backend -- "Internal Logistics API" --> CourierAdapter
 
-BE .left.o COURIER : uses
-CI .right. COURIER
+    %% Внешние связи
+    CourierAdapter -- "External API / Webhooks" --> ExtCouriers
+    Backend -- "Payment API" --> PaymentSys
 
-BE .down.o SQL : uses
-DB .up. SQL
-
-' Склад Модулі - База
-IM .down.o SQL : uses
-
-' Склад Модулі - Backend (интерфейс арқылы)
-BE .up.o INV : uses
-IM .down. INV
-
-' Сыртқы интеграциялар
-CI --> ExtCourier : REST/Webhook
-NS --> ExtNotif : API
-
-' Backend және Төлем Жүйесі (Сыртқы жүйе)
-Payment -- BE : Tolem / Qaytarym
-
-@enduml
+    %% Стилизацwd
+    style Backend fill:#f9f,stroke:#333,stroke-width:2px
+    style DB fill:#ff9,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5
 
 ```
