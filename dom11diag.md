@@ -1,164 +1,142 @@
 ```mermaid
-@startuml
-skinparam classAttributeIconSize 0
-skinparam shadowing false
 
-abstract class User {
-    -id: Long
-    -name: String
-    -email: String
-    -phone: String
-    -address: String
-    -role: Role
-    +register()
-    +login()
-    +updateProfile()
-    +getOrders(): List<Order>
-}
+classDiagram
+    direction TB
 
-class Customer {
-    -loyaltyPoints: int
-    +addLoyaltyPoints(points: int)
-    +applyDiscount(code: String): double
-}
+    class User {
+        -Long id
+        -String name
+        -String email
+        -String phone
+        -String address
+        -Role role
+        +register()
+        +login()
+        +updateProfile()
+        +getOrders() List~Order~
+    }
 
-class Administrator {
-    +logAction(action: String)
-    +manageProducts()
-    +manageUsers()
-}
+    class Customer {
+        -int loyaltyPoints
+        +addLoyaltyPoints(points)
+        +applyDiscount(code) double
+    }
 
-enum Role { CLIENT, ADMIN }
+    class Administrator {
+        +logAction(action)
+        +manageProducts()
+        +manageUsers()
+    }
 
-class Category {
-    -id: Long
-    -name: String
-    -parentCategory: Category
-}
+    class Category {
+        -Long id
+        -String name
+        -Category parentCategory
+    }
 
-class Product {
-    -id: Long
-    -name: String
-    -description: String
-    -price: BigDecimal
-    -stockQuantity: int
-    -discountPercent: double
-    -images: List<String>
-    +applyDiscount(percent: double)
-    +reduceStock(quantity Puj: int)
-    +increaseStock(quantity: int)
-}
+    class Product {
+        -Long id
+        -String name
+        -String description
+        -BigDecimal price
+        -int stockQuantity
+        -double discountPercent
+        -List~String~ images
+        +reduceStock(qty)
+        +increaseStock(qty)
+    }
 
-abstract class Payment {
-    -id: Long
-    -amount: BigDecimal
-    -date: LocalDateTime
-    -status: PaymentStatus
-    +process(): boolean
-    +refund(): boolean
-}
+    class Payment {
+        <<abstract>>
+        -Long id
+        -BigDecimal amount
+        -LocalDateTime date
+        -PaymentStatus status
+        +process() boolean
+        +refund() boolean
+    }
 
-class CardPayment extends Payment {
-    -cardLastFour: String
-    -cardType: String
-}
+    class CardPayment {
+        -String cardLastFour
+        -String cardType
+    }
 
-class WalletPayment extends Payment {
-    -walletProvider: String
-}
+    class WalletPayment {
+        -String walletProvider
+    }
 
-enum PaymentStatus { PENDING, COMPLETED, FAILED, REFUNDED }
+    class Order {
+        -Long id
+        -LocalDateTime orderDate
+        -OrderStatus status
+        -BigDecimal totalAmount
+        -String promoCode
+        +calculateTotal()
+        +applyPromoCode(code)
+        +placeOrder()
+        +cancel()
+        +pay(payment)
+    }
 
-class Order {
-    -id: Long
-    -orderDate: LocalDateTime
-    -status: OrderStatus
-    -totalAmount: BigDecimal
-    -promoCode: String
-    -discountAmount: BigDecimal
-    +calculateTotal()
-    +applyPromoCode(code: String)
-    +placeOrder()
-    +cancel()
-    +pay(payment: Payment)
-}
+    class OrderItem {
+        -int quantity
+        -BigDecimal unitPrice
+    }
 
-class OrderItem {
-    -quantity: int
-    -unitPrice: BigDecimal
-    -discountApplied: BigDecimal
-}
+    class Delivery {
+        -Long id
+        -String address
+        -DeliveryStatus deliveryStatus
+        -String trackingNumber
+        -String courierName
+        +track()
+        +complete()
+    }
 
-class Delivery {
-    -id: Long
-    -address: String
-    -deliveryStatus: DeliveryStatus
-    -trackingNumber: String
-    -courierName: String
-    -estimatedDate: LocalDate
-    +track()
-    +complete()
-}
+    class Review {
+        -Long id
+        -int rating
+        -String comment
+        -LocalDateTime date
+    }
 
-class Review {
-    -id: Long
-    -rating: int (1-5)
-    -comment: String
-    -date: LocalDateTime
-    -isApproved: boolean
-}
+    class Warehouse {
+        -Long id
+        -String name
+        -String location
+    }
 
-class PromoCode {
-    -code: String
-    -discountPercent: double
-    -validUntil: LocalDate
-    -minOrderAmount: BigDecimal
-    +isValid(orderAmount: BigDecimal): boolean
-}
+    class ProductWarehouse {
+        -int quantity
+    }
 
-class Warehouse {
-    -id: Long
-    -name: String
-    -location: String
-}
+    class PromoCode {
+        -String code
+        -double discountPercent
+        -LocalDate validUntil
+    }
 
-class ProductWarehouse {
-    -quantity: int
-}
+    %% Наследование
+    User <|-- Customer
+    User <|-- Administrator
+    Payment <|-- CardPayment
+    Payment <|-- WalletPayment
 
-enum OrderStatus { PENDING, CONFIRMED, PAID, SHIPPED, DELIVERED, CANCELLED, REFUNDED }
-enum DeliveryStatus { PREPARING, IN_TRANSIT, DELIVERED, FAILED }
+    %% Связи
+    Customer "1" --> "0..*" Order : places
+    Order "1" --> "1" Customer : belongs to
+    Order "1" --> "1" Delivery : has
+    Order "1" --> "0..*" OrderItem : contains
+    OrderItem "many" --> "1" Product : refers to
+    Product "many" --> "1" Category : belongs to
+    Product "0..*" --> "0..*" Review : has
+    Customer "1" --> "0..*" Review : writes
+    ProductWarehouse "many" --> "1" Product
+    ProductWarehouse "many" --> "1" Warehouse
+    Order "1" --> "0..1" Payment : paid with
+    Order "0..*" --> "0..1" PromoCode : uses
 
-' Наследование
-User <|-- Customer
-User <|-- Administrator
-Payment <|-- CardPayment
-Payment <|-- WalletPayment
+    %% Ескертпе
+    note for Payment "Абстрактный класс Payment\nжаңа төлем түрлерін қосуды жеңілдетеді\n(Apple Pay, Crypto т.б.)"
 
-' Связи
-Customer "1" --> "0.." Order : places
-Order "1" --> "1" Customer : belongs to
-Order "1" --> "1" Delivery : has
-Order "1" --> "0.." OrderItem : contains
-OrderItem "many" --> "1" Product : refers to
-
-Product "many" --> "1" Category : belongs to
-Product "many" --> "0.." Review : has reviews
-
-Customer "1" --> "0.." Review : writes
-
-ProductWarehouse "many" --> "1" Product
-ProductWarehouse "many" --> "1" Warehouse
-
-Order "0.." --> "1" Payment : paid with
-
-' Дополнительно: абстрактный класс Payment использован как пример полиморфизма
-note right of Payment
-  Абстрактный класс Payment позволяет
-  легко добавлять новые способы оплаты
-  (Apple Pay, Crypto и т.д.) без изменения
-  существующего кода Order.
-end note
-
-@enduml
 ```
