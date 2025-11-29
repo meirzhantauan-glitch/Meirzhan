@@ -1,208 +1,146 @@
+```mermaid
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam nodesep 60
+skinparam ranksep 70
+skinparam class {
+    BackgroundColor #E3F2FD
+    BorderColor #1565C0
+    ArrowColor #1565C0
+}
 
-```mermaid              
-classDiagram
+title Интернет-дүкен: UML Класс диаграммасы
 
-    %% 1.  пользователь (Абстракция и Наследование)
-    class User {
-        <<Abstract>>
-        +int id
-        +string name
-        +string email
-        +string address
-        +string phone
-        +register()
-        +login()
-        +updateProfile()
-    }
+abstract class Пайдаланушы {
+    +ID : int
+    +АтыЖөні : string
+    +Email : string
+    +Мекенжайы : string
+    +Телефон : string
+    +Рөлі : string
+    --
+    +Тіркелу()
+    +Кіру()
+    +ДеректердіЖаңарту()
+}
 
-    class Client {
-        +int loyaltyPoints
-        +List~Order~ orderHistory
-        +addToCart(Product, int)
-        +placeOrder()
-        +writeReview()
-    }
+class Клиент {
+    +БонустықБалл : int
+    +НачислитьБаллы(сумма)
+    +ТапсырыстарТарихы()
+}
 
-    class Administrator {
-        +int adminLevel
-        +createProduct()
-        +updateProduct()
-        +manageUsers()
-        +viewLogs()
-    }
+class Әкімші {
+    +ЛогҚұру(әрекет)
+    +ТауарҚосу()
+    +ТауарӨшіру()
+}
 
+class Тауар {
+    +ID : int
+    +Атауы : string
+    +Сипаттамасы : string
+    +Бағасы : decimal
+    +ҚоймадағыСаны : int
+    +Фото : string
+    +ЖеңілдікПроценті : decimal
+    --
+    +Жаңарту()
+    +Өшіру()
+    +ҚолжетімділікТексеру() : bool
+}
 
+class Категория {
+    +ID : int
+    +Атауы : string
+}
 
+class Тапсырыс {
+    +ID : int
+    +ЖасалғанКүні : DateTime
+    +Статус : enum {Оформлен, Жөнелтілген, Жеткізілген, Тоқтатылған}
+    +ЖалпыСомасы : decimal
+    +Промокод : string
+    --
+    +Растау()
+    +Тоқтату()
+    +Төлеу()
+    +СоманыЕсептеу()
+}
 
-    %% 2.  товар
-    class Product {
-        +int id
-        +string name
-        +string description
-        +double price
-        +int stockQuantity
-        +updateStock(int)
-        +getRating() double
-    }
+class ТапсырысЖолы {
+    +Саны : int
+    +БірлікБағасы : decimal
+    +Жиынтық : decimal
+}
 
-    class Category {
-        +int id
-        +string name
-        +string description
-    }
+class Төлем {
+    +ID : int
+    +Түрі : enum {Карта, ЭлКошелек, ҚолмаҚол}
+    +Сомасы : decimal
+    +Статус : enum {Сәтті, Сәтсіз, Қайтарылды}
+    +Күні : DateTime
+    --
+    +Өңдеу()
+    +Қайтару()
+}
 
+class Жеткізу {
+    +ID : int
+    +Мекенжай : string
+    +Статус : enum {Дайындалуда, Жолда, Жеткізілді}
+    +Курьер : string
+    +ТрекНөмірі : string
+    --
+    +Жөнелту()
+    +Бақылау()
+    +Аяқтау()
+}
 
+class Пікір {
+    +ID : int
+    +Бағасы : int (1-5)
+    +Мәтіні : string
+    +Күні : DateTime
+}
 
+class Қойма {
+    +ID : int
+    +Атауы : string
+    +Мекенжайы : string
+}
 
+' Наследование
+Пайдаланушы <|-- Клиент
+Пайдаланушы <|-- Әкімші
 
+' Ассоциациялар
+Клиент ||--o{ Тапсырыс : жасайды
+Тапсырыс }o--|| Клиент
 
-    %% 3.  заказ
-    class Order {
-        +int id
-        +Date creationDate
-        +OrderStatus status
-        +double totalAmount
-        +applyPromo(PromoCode)
-        +calculateTotal()
-        +cancel()
-    }
+Тапсырыс ||--o{ ТапсырысЖолы
+ТапсырысЖолы }o--o{ Тауар : қамтиды
 
-    class OrderItem {
-        +int quantity
-        +double priceAtPurchase
-        +calculateSubTotal()
-    }
+Тауар }o--|| Категория : тиесілі
 
-    class Cart {
-        +double currentTotal
-        +addItem(Product, int)
-        +removeItem(Product)
-        +clear()
-    }
+Тапсырыс ||--|| Төлем : байланысты
+Тапсырыс ||--|| Жеткізу : байланысты
 
-    class PromoCode {
-        +string code
-        +double discountValue
-        +Date expiryDate
-        +isValid()
-    }
+Клиент ||--o{ Пікір : жазады
+Тауар ||--o{ Пікір : алады
 
+Тауар }o--o{ Қойма : сақталады
 
+note right of ТапсырысЖолы
+  Тапсырыс пен Тауар арасындағы
+  көп-ке-көп қатынасты жүзеге асырады
+end note
 
-
-
-    %% 4.  логистиккаа
-    class Delivery {
-        +int id
-        +string deliveryAddress
-        +DeliveryStatus status
-        +Date estimatedDate
-        +assignCourier(Courier)
-        +track()
-        +complete()
-    }
-
-    class Courier {
-        +int id
-        +string name
-        +string vehicleInfo
-        +updateDeliveryStatus()
-    }
-
-    %% 5.  финансыы
-    class Payment {
-        +int id
-        +double amount
-        +PaymentType type
-        +PaymentStatus status
-        +Date date
-        +process()
-        +refund()
-    }
-
-    %% 6.  отзыв
-    class Review {
-        +int id
-        +int rating
-        +string comment
-        +Date date
-    }
-
-    %%  ENUMS (Перечисления) 
-    class OrderStatus {
-        <<enumeration>>
-        PROCESSING
-        SHIPPED
-        DELIVERED
-        CANCELLED
-    }
-
-    class DeliveryStatus {
-        <<enumeration>>
-        PENDING
-        IN_TRANSIT
-        DELIVERED
-    }
-
-    class PaymentType {
-        <<enumeration>>
-        CREDIT_CARD
-        E_WALLET
-        CASH
-    }
-
-    class PaymentStatus {
-        <<enumeration>>
-        PENDING
-        COMPLETED
-        FAILED
-        REFUNDED
-    }
-
-
-
-
-
-
-
-
-    %%  ОТНОШЕНИЯ 
-
-    %% Наследование
-    User <|-- Client
-    User <|-- Administrator
-
-    %% Пользователи и Заказы
-    Client "1" --> "*" Order : places
-    Client "1" --> "1" Cart : owns
-    Cart "1" o-- "*" OrderItem : contains
-
-    %% Заказы и Товары
-    Order "1" *-- "*" OrderItem : contains
-    Product "1" -- "*" OrderItem : listed in
-    
-    %% Товары и Категории
-    Category "1" -- "*" Product : contains
-
-    %% Заказы и Промокоды
-    Order "*" --> "0..1" PromoCode : applies
-
-    %% Логистика
-    Order "1" -- "1" Delivery : requires
-    Delivery "*" --> "0..1" Courier : handled by
-
-    %% Финансы
-    Order "1" -- "1" Payment : paid by
-
-    %% Отзывы (Связь с клиентом и товаром)
-    Client "1" --> "*" Review : writes
-    Product "1" -- "*" Review : has
-    
-    %% Зависимости от Enum
-    Order ..> OrderStatus
-    Delivery ..> DeliveryStatus
-    Payment ..> PaymentType
-    Payment ..> PaymentStatus
-
+note bottom of Пайдаланушы
+  Абстракті класс – тікелей объект
+  құрылмайды, тек мұрагерлік үшін
+end note
+@enduml
 
 ```
