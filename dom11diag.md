@@ -2,146 +2,163 @@
 @startuml
 skinparam classAttributeIconSize 0
 skinparam shadowing false
-skinparam nodesep 70
-skinparam ranksep 80
-skinparam class {
-    BackgroundColor #E3F2FD
-    BorderColor #1565C0
-    ArrowColor #1565C0
+
+abstract class User {
+    -id: Long
+    -name: String
+    -email: String
+    -phone: String
+    -address: String
+    -role: Role
+    +register()
+    +login()
+    +updateProfile()
+    +getOrders(): List<Order>
 }
 
-title Internet-duken: UML Klass diagrammasy
-
-abstract class Paydalanushy {
-    +ID : int
-    +AtyJoni : string
-    +Email : string
-    +Mekenjay : string
-    +Telefon : string
-    +Roli : string
-    --
-    +Tirkelu()
-    +Kiru()
-    +DerekterdiJangartu()
+class Customer {
+    -loyaltyPoints: int
+    +addLoyaltyPoints(points: int)
+    +applyDiscount(code: String): double
 }
 
-class Klient {
-    +BonustykBall : int
-    +NacislitBall(somma)
-    +TapsyrytarTarihy()
+class Administrator {
+    +logAction(action: String)
+    +manageProducts()
+    +manageUsers()
 }
 
-class Akimshi {
-    +LogKuru(areket)
-    +TauarKosu()
-    +TauarOshiru()
+enum Role { CLIENT, ADMIN }
+
+class Category {
+    -id: Long
+    -name: String
+    -parentCategory: Category
 }
 
-class Tauar {
-    +ID : int
-    +Atau : string
-    +Sipattama : string
-    +Bagasy : decimal
-    +QoymadagySany : int
-    +Foto : string
-    +JenildikProcenti : decimal
-    --
-    +Jangartu()
-    +Oshiru()
-    +QoljetimdilikTekseru() : bool
+class Product {
+    -id: Long
+    -name: String
+    -description: String
+    -price: BigDecimal
+    -stockQuantity: int
+    -discountPercent: double
+    -images: List<String>
+    +applyDiscount(percent: double)
+    +reduceStock(quantity Puj: int)
+    +increaseStock(quantity: int)
 }
 
-class Kategoriya {
-    +ID : int
-    +Atau : string
+abstract class Payment {
+    -id: Long
+    -amount: BigDecimal
+    -date: LocalDateTime
+    -status: PaymentStatus
+    +process(): boolean
+    +refund(): boolean
 }
 
-class Tapsyrys {
-    +ID : int
-    +JasalganKuni : DateTime
-    +Status : enum {Oformlen, Joneltilgen, Jetkizilgen, Toqtatyldy}
-    +JalpySomasy : decimal
-    +Promokod : string
-    --
-    +Rastau()
-    +Toqtatuy()
-    +Toleu()
-    +SomanyEsepteu()
+class CardPayment extends Payment {
+    -cardLastFour: String
+    -cardType: String
 }
 
-class TapsyrysJoly {
-    +Sany : int
-    +BirlikBagasy : decimal
-    +Jiyntyq : decimal
+class WalletPayment extends Payment {
+    -walletProvider: String
 }
 
-class Tolem {
-    +ID : int
-    +Turi : enum {Karta, ElKoshelek, QolmaQol}
-    +Somasy : decimal
-    +Status : enum {Satti, Satsiz, Qaytaryldy}
-    +Kuni : DateTime
-    --
-    +Ondeu()
-    +Qaytaru()
+enum PaymentStatus { PENDING, COMPLETED, FAILED, REFUNDED }
+
+class Order {
+    -id: Long
+    -orderDate: LocalDateTime
+    -status: OrderStatus
+    -totalAmount: BigDecimal
+    -promoCode: String
+    -discountAmount: BigDecimal
+    +calculateTotal()
+    +applyPromoCode(code: String)
+    +placeOrder()
+    +cancel()
+    +pay(payment: Payment)
 }
 
-class Jetkizu {
-    +ID : int
-    +Mekenjay : string
-    +Status : enum {Dayyndaluda, Jolda, Jetkizildi}
-    +Kuryer : string
-    +TrekNomiri : string
-    --
-    +Jonelty()
-    +Baqylau()
-    +Ayaqtau()
+class OrderItem {
+    -quantity: int
+    -unitPrice: BigDecimal
+    -discountApplied: BigDecimal
 }
 
-class Pikir {
-    +ID : int
-    +Bagasy : int (1-5)
-    +Matini : string
-    +Kuni : DateTime
+class Delivery {
+    -id: Long
+    -address: String
+    -deliveryStatus: DeliveryStatus
+    -trackingNumber: String
+    -courierName: String
+    -estimatedDate: LocalDate
+    +track()
+    +complete()
 }
 
-class Qoyma {
-    +ID : int
-    +Atau : string
-    +Mekenjay : string
+class Review {
+    -id: Long
+    -rating: int (1-5)
+    -comment: String
+    -date: LocalDateTime
+    -isApproved: boolean
 }
 
-' Muragerlik
-Paydalanushy <|-- Klient
-Paydalanushy <|-- Akimshi
+class PromoCode {
+    -code: String
+    -discountPercent: double
+    -validUntil: LocalDate
+    -minOrderAmount: BigDecimal
+    +isValid(orderAmount: BigDecimal): boolean
+}
 
-' Assotsiatsiyalar
-Klient ||--o{ Tapsyrys : jasaydy
-Tapsyrys }o--|| Klient
+class Warehouse {
+    -id: Long
+    -name: String
+    -location: String
+}
 
-Tapsyrys ||--o{ TapsyrysJoly
-TapsyrysJoly }o--o{ Tauar : qamtydy
+class ProductWarehouse {
+    -quantity: int
+}
 
-Tauar }o--|| Kategoriya : tiesili
+enum OrderStatus { PENDING, CONFIRMED, PAID, SHIPPED, DELIVERED, CANCELLED, REFUNDED }
+enum DeliveryStatus { PREPARING, IN_TRANSIT, DELIVERED, FAILED }
 
-Tapsyrys ||--|| Tolem : baylanysty
-Tapsyrys ||--|| Jetkizu : baylanysty
+' Наследование
+User <|-- Customer
+User <|-- Administrator
+Payment <|-- CardPayment
+Payment <|-- WalletPayment
 
-Klient ||--o{ Pikir : jazady
-Tauar ||--o{ Pikir : alady
+' Связи
+Customer "1" --> "0.." Order : places
+Order "1" --> "1" Customer : belongs to
+Order "1" --> "1" Delivery : has
+Order "1" --> "0.." OrderItem : contains
+OrderItem "many" --> "1" Product : refers to
 
-Tauar }o--o{ Qoyma : saqtala
+Product "many" --> "1" Category : belongs to
+Product "many" --> "0.." Review : has reviews
 
-note right of TapsyrysJoly
-  Tapsyrys pen Tauar arasyn
-  kop-ke-kop qatynasty
-  juzegе asyrady
+Customer "1" --> "0.." Review : writes
+
+ProductWarehouse "many" --> "1" Product
+ProductWarehouse "many" --> "1" Warehouse
+
+Order "0.." --> "1" Payment : paid with
+
+' Дополнительно: абстрактный класс Payment использован как пример полиморфизма
+note right of Payment
+  Абстрактный класс Payment позволяет
+  легко добавлять новые способы оплаты
+  (Apple Pay, Crypto и т.д.) без изменения
+  существующего кода Order.
 end note
 
-note bottom of Paydalanushy
-  Abstrakti klass – tikеley obekt
-  qurylmaydy, tek muragerlik ushin
-end note
 @enduml
-
 ```
