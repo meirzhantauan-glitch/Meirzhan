@@ -2,144 +2,145 @@
 @startuml
 skinparam classAttributeIconSize 0
 skinparam shadowing false
-skinparam nodesep 60
-skinparam ranksep 70
+skinparam nodesep 70
+skinparam ranksep 80
 skinparam class {
     BackgroundColor #E3F2FD
     BorderColor #1565C0
     ArrowColor #1565C0
 }
 
-title Интернет-дүкен: UML Класс диаграммасы
+title Internet-duken: UML Klass diagrammasy
 
-abstract class Пайдаланушы {
+abstract class Paydalanushy {
     +ID : int
-    +АтыЖөні : string
+    +AtyJoni : string
     +Email : string
-    +Мекенжайы : string
-    +Телефон : string
-    +Рөлі : string
+    +Mekenjay : string
+    +Telefon : string
+    +Roli : string
     --
-    +Тіркелу()
-    +Кіру()
-    +ДеректердіЖаңарту()
+    +Tirkelu()
+    +Kiru()
+    +DerekterdiJangartu()
 }
 
-class Клиент {
-    +БонустықБалл : int
-    +НачислитьБаллы(сумма)
-    +ТапсырыстарТарихы()
+class Klient {
+    +BonustykBall : int
+    +NacislitBall(somma)
+    +TapsyrytarTarihy()
 }
 
-class Әкімші {
-    +ЛогҚұру(әрекет)
-    +ТауарҚосу()
-    +ТауарӨшіру()
+class Akimshi {
+    +LogKuru(areket)
+    +TauarKosu()
+    +TauarOshiru()
 }
 
-class Тауар {
+class Tauar {
     +ID : int
-    +Атауы : string
-    +Сипаттамасы : string
-    +Бағасы : decimal
-    +ҚоймадағыСаны : int
-    +Фото : string
-    +ЖеңілдікПроценті : decimal
+    +Atau : string
+    +Sipattama : string
+    +Bagasy : decimal
+    +QoymadagySany : int
+    +Foto : string
+    +JenildikProcenti : decimal
     --
-    +Жаңарту()
-    +Өшіру()
-    +ҚолжетімділікТексеру() : bool
+    +Jangartu()
+    +Oshiru()
+    +QoljetimdilikTekseru() : bool
 }
 
-class Категория {
+class Kategoriya {
     +ID : int
-    +Атауы : string
+    +Atau : string
 }
 
-class Тапсырыс {
+class Tapsyrys {
     +ID : int
-    +ЖасалғанКүні : DateTime
-    +Статус : enum {Оформлен, Жөнелтілген, Жеткізілген, Тоқтатылған}
-    +ЖалпыСомасы : decimal
-    +Промокод : string
+    +JasalganKuni : DateTime
+    +Status : enum {Oformlen, Joneltilgen, Jetkizilgen, Toqtatyldy}
+    +JalpySomasy : decimal
+    +Promokod : string
     --
-    +Растау()
-    +Тоқтату()
-    +Төлеу()
-    +СоманыЕсептеу()
+    +Rastau()
+    +Toqtatuy()
+    +Toleu()
+    +SomanyEsepteu()
 }
 
-class ТапсырысЖолы {
-    +Саны : int
-    +БірлікБағасы : decimal
-    +Жиынтық : decimal
+class TapsyrysJoly {
+    +Sany : int
+    +BirlikBagasy : decimal
+    +Jiyntyq : decimal
 }
 
-class Төлем {
+class Tolem {
     +ID : int
-    +Түрі : enum {Карта, ЭлКошелек, ҚолмаҚол}
-    +Сомасы : decimal
-    +Статус : enum {Сәтті, Сәтсіз, Қайтарылды}
-    +Күні : DateTime
+    +Turi : enum {Karta, ElKoshelek, QolmaQol}
+    +Somasy : decimal
+    +Status : enum {Satti, Satsiz, Qaytaryldy}
+    +Kuni : DateTime
     --
-    +Өңдеу()
-    +Қайтару()
+    +Ondeu()
+    +Qaytaru()
 }
 
-class Жеткізу {
+class Jetkizu {
     +ID : int
-    +Мекенжай : string
-    +Статус : enum {Дайындалуда, Жолда, Жеткізілді}
-    +Курьер : string
-    +ТрекНөмірі : string
+    +Mekenjay : string
+    +Status : enum {Dayyndaluda, Jolda, Jetkizildi}
+    +Kuryer : string
+    +TrekNomiri : string
     --
-    +Жөнелту()
-    +Бақылау()
-    +Аяқтау()
+    +Jonelty()
+    +Baqylau()
+    +Ayaqtau()
 }
 
-class Пікір {
+class Pikir {
     +ID : int
-    +Бағасы : int (1-5)
-    +Мәтіні : string
-    +Күні : DateTime
+    +Bagasy : int (1-5)
+    +Matini : string
+    +Kuni : DateTime
 }
 
-class Қойма {
+class Qoyma {
     +ID : int
-    +Атауы : string
-    +Мекенжайы : string
+    +Atau : string
+    +Mekenjay : string
 }
 
-' Наследование
-Пайдаланушы <|-- Клиент
-Пайдаланушы <|-- Әкімші
+' Muragerlik
+Paydalanushy <|-- Klient
+Paydalanushy <|-- Akimshi
 
-' Ассоциациялар
-Клиент ||--o{ Тапсырыс : жасайды
-Тапсырыс }o--|| Клиент
+' Assotsiatsiyalar
+Klient ||--o{ Tapsyrys : jasaydy
+Tapsyrys }o--|| Klient
 
-Тапсырыс ||--o{ ТапсырысЖолы
-ТапсырысЖолы }o--o{ Тауар : қамтиды
+Tapsyrys ||--o{ TapsyrysJoly
+TapsyrysJoly }o--o{ Tauar : qamtydy
 
-Тауар }o--|| Категория : тиесілі
+Tauar }o--|| Kategoriya : tiesili
 
-Тапсырыс ||--|| Төлем : байланысты
-Тапсырыс ||--|| Жеткізу : байланысты
+Tapsyrys ||--|| Tolem : baylanysty
+Tapsyrys ||--|| Jetkizu : baylanysty
 
-Клиент ||--o{ Пікір : жазады
-Тауар ||--o{ Пікір : алады
+Klient ||--o{ Pikir : jazady
+Tauar ||--o{ Pikir : alady
 
-Тауар }o--o{ Қойма : сақталады
+Tauar }o--o{ Qoyma : saqtala
 
-note right of ТапсырысЖолы
-  Тапсырыс пен Тауар арасындағы
-  көп-ке-көп қатынасты жүзеге асырады
+note right of TapsyrysJoly
+  Tapsyrys pen Tauar arasyn
+  kop-ke-kop qatynasty
+  juzegе asyrady
 end note
 
-note bottom of Пайдаланушы
-  Абстракті класс – тікелей объект
-  құрылмайды, тек мұрагерлік үшін
+note bottom of Paydalanushy
+  Abstrakti klass – tikеley obekt
+  qurylmaydy, tek muragerlik ushin
 end note
 @enduml
 
